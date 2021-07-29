@@ -26,7 +26,7 @@ CXX_COMMON+= -L$(PREFIX_LIB) -Wl,-rpath,$(PREFIX_LIB) -lpythia8 -ldl
 PYTHIA=$(PREFIX_LIB)/libpythia8$(LIB_SUFFIX)
 
 ################################################################################
-# RULES: Definition of the rules used to build the PYTHIA examples.
+# RULES: Definition of the rules used to build the PYTHIA Higgs2mumu.
 ################################################################################
 
 # Rules without physical targets (secondary expansion for specific rules).
@@ -35,17 +35,12 @@ PYTHIA=$(PREFIX_LIB)/libpythia8$(LIB_SUFFIX)
 
 # All targets (no default behavior).
 all:
-	$(info Usage: make mainXX)
+	$(info Usage: make mymainXX)
 
 # PYTHIA library.
 $(PYTHIA):
 	$(error Error: PYTHIA must be built, please run "make"\
                 in the top PYTHIA directory)
-
-# Examples without external dependencies.
-main%: $(PYTHIA) main%.cc
-	$(CXX) $@.cc -o $@ $(CXX_COMMON)
-
 
 # ROOT libraries generated via CINT.
 main%.so: main%Dct.cc
@@ -66,21 +61,14 @@ ifeq ($(ROOT_USE),true)
 else
 	$(error Error: $@ requires ROOT)
 endif
-main92: $(PYTHIA) $$@.cc main92.so
-	$(CXX) $@.cc main92.so -o $@ -w $(CXX_COMMON) -Wl,-rpath,./\
-	 `$(ROOT_CONFIG) --cflags --glibs`
 
-# RIVET with optional ROOT (if RIVET, use C++14).
-main93: $(PYTHIA) $$@.cc $(if $(filter true,$(ROOT_USE)),main93.so)
-ifeq ($(RIVET_USE),true)
-	$(CXX) $@.cc -o $@ -w $(CXX_COMMON:c++11=c++14) -Wl,-rpath,./\
-	 $(if $(filter true,$(ROOT_USE)),main93.so -DPY8ROOT\
-         $(ROOT_LIB) `$(ROOT_CONFIG) --cflags --glibs`)\
-	 $(RIVET_INCLUDE) $(RIVET_LIB)
+# HEPMC3
+mymain02: $(PYTHIA) mymain02.cc
+ifeq ($(HEPMC3_USE),true)
+	$(CXX) $@.cc -o $@ $(HEPMC3_INCLUDE) $(CXX_COMMON) $(HEPMC3_LIB)
 else
-	$(error Error: $@ requires RIVET)
+	$(error Error: $@ requieres HEPMC3)
 endif
-
 
 # User-written examples for tutorials, without external dependencies.
 mymain%: $(PYTHIA) mymain%.cc

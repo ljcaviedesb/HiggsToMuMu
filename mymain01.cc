@@ -11,52 +11,43 @@ using namespace Pythia8;
 int main (int argc, char* arg[]){
 
   // Create the ROOT application environment. 
-  TApplication theApp("muon1", &argc, arg);
+  TApplication theApp("muon", &argc, arg);
   
   Pythia pythia;
-  pythia.readString("HiggsSM:gg2h = on");
-  //  pythia.readString("HiggsSM:all = on");
-  //  pythia.readString("HardQCD:all = on");
-  //  pythia.readString("PhaseSpace:pTHatMin = 20.");
-  pythia.readString("Beams:eCM = 13000");
+  pythia.readString("Beams:eCM = 13000");     // sqrt(s)=13TeV
+  pythia.readString("HiggsSM:gg2h = on");     // Higgs production by gg fusion
+  pythia.readString("25:onMode = 1");         // Disallow Higgs decay
+  pythia.readString("25:onIfAll = 13 -13");   // Allow only H -> µµ  
   pythia.init();
 
   //Create file.root
   TFile* outFile = new TFile("muon.root", "RECREATE");
-
+  // Declare variables
   Event *event = &pythia.event;
   Float_t pT=0, eta=0, phi=0, E=0, m=0, px=0, py=0, pz=0, ET=0;
-  Int_t imu = 0, imum = 0, iHiggs = 0;
+   Float_t pTm=0, etam=0, phim=0, Em=0, mm=0, pxm=0, pym=0, pzm=0, ETm=0;
+  Float_t invmass=0, tp=0, tpx=0, tpy=0, tpz=0, tpT=0, tE=0, tET=0;
   
+  // Create Tree and branches of the tree
   TTree *T = new TTree("T","ev1 Tree");
   T->Branch("event",&event,"Event");
-  T->Branch("pT",&pT);
+  T->Branch("tpT",&pT);
   T->Branch("eta",&eta);
+  T->Branch("etam",&etam);
   T->Branch("phi",&phi);
-  T->Branch("E",&E);
-  T->Branch("m",&m);
+  T->Branch("phim",&phim);
+  T->Branch("tE",&E);
+  T->Branch("invmass",&mass);
+  T->Branch("tp", &tp);
 
-
-  for (int iEvent = 0; iEvent<10000; ++iEvent){
-    if(!pythia.next()) continue;
-
-    for (int i = 0; i<pythia.event.size(); ++i){
-      Int_t muon = pythia.event[i].id()==13;
-      Int_t muonm = pythia.event[i].id()==-13;
-      Int_t bottom = pythia.event[i].id()==5;
-      Int_t top = pythia.event[i].id()==6;
-      Int_t charm = pythia.event[i].id()==4;
-      Int_t gluon = pythia.event[i].id()==21;
-      Int_t foton = pythia.event[i].id()==22;
-      Int_t Z = pythia.event[i].id()==23;
-      Int_t W = pythia.event[i].id()==24;
-      Int_t H = pythia.event[i].id()==25;
-
-      /*To make every ROOT file for each Higgs decay change the if for each decay wanted 
-	like if (bottom || H){ or if (Z || H){  and also is needed to be change the name 
-	of the application and output root file*/
-      if (muon || H){
-
+  // Start process
+  for (int iEvent = 0; iEvent<10000; ++iEvent){ // 10 000 events
+    if(!pythia.next()) continue;                // jump to the next event
+    // Select muons
+    for (int i1 = 0; i1 < pythia.event.size(); ++i1){
+      Int_t imuon=0;                            // Create iterator
+      if ( pythia.event[i1].id()==13){
+	imuon = i1;
 	pT = pythia.event[i].pT();
 	px = pythia.event[i].px();
 	py = pythia.event[i].py();
@@ -65,14 +56,37 @@ int main (int argc, char* arg[]){
 	phi = pythia.event[i].phi();
 	E = pythia.event[i].e();
 	ET = pythia.event[i].eT();
-	m = pythia.event[i].mCalc();
-	
-	
-     }
-    }
-    
-    T->Fill();
+	m = pythia.event[i].mCalc();	
+      }// close muon selection
+    }// close muon loop
+    // Select anti-muons
+    for ( int i1 = 0; i2 < pythia.event.size(); ++i2){
+      Int_t imuonm = 0;
+      if (pythia.event[i2].id()==-13){
+	imuonm = i2;
+	pTm = pythia.event[i].pT();
+	pxm = pythia.event[i].px();
+	pym = pythia.event[i].py();
+	pzm = pythia.event[i].pz();
+	etam = pythia.event[i].eta();
+	phim = pythia.event[i].phi();
+	Em = pythia.event[i].e();
+	ETm = pythia.event[i].eT();
+	mm = pythia.event[i].mCalc();
+      }// close anit-muons selection
+    }// close anti-muon loop
 
+    tpx = px + pxm;
+    tpy = py + pym;
+    tpz = pz + pzm;
+    tp  = sqrt(pow2(tpx) + pow2(tpy) + pow2(tpz));
+    tpT = sqrt(pow2(tpx) + pow2(tpy) );
+    tE  = E + Em;
+    tET = ET + ETm;
+    invmass = sqrt(pow2(tE) - pow2(tp) );
+
+	
+    T->Fill();
   }
 
   pythia.stat();
