@@ -31,61 +31,62 @@ En la página oficial de ROOT se encuentra el paso a paso de la instalación. Pa
 * *libssl-dev:*
 
 Despues de verificar, se procede a la [instalación](https://root.cern/install/https://root.cern/install/).
-´´´
-wget https://root.cern/download/root_v6.20.08.source.tar.gz
-tar -xzvf root_v6.20.08.source.tar.gz
-´´´
+
+```bash
+  wget https://root.cern/download/root_v6.20.08.source.tar.gz
+  tar -xzvf root_v6.20.08.source.tar.gz
+```
 Y hacer un source para ejecutar root
-´´´
+```bash
 source root/bin/thisroot.sh
-´´´
+```
 ## Tcl Developer
 
 Tcl es necesario para instalar Delphes, usualmente viene instalado en las versiones de linux y Mac OS y para verificar que se encuentre instalado se ejecuta el siguiente comando
-´´´
+```bash
 tclsh
-´´´
+```
 y escribimos
-´´´
+```bash
 info patchlevel
-´´´ 
+```
 Aparece la versión de tcl instalada y con eso es suficiente, para salir se escribe exit.
 Si no se encuentra instalada, en la [página oficial](http://www.tcl.tk/software/tcltk/) se encuentran las nstrucciones. Según el sistema operativo
-´´´
+```bash
 sudo apt-get install tcl
-´´´
+```
 y para verificar se hace lo previamente escrito.
 
 ## Pythia
 
 Descarga y descomprime el archivo de la [página oficial](https://pythia.org/)
-´´´
+```bash
 wget https://pythia.org/download/pythia83/pythia8306.tgz
 tar xvfz pythia8306.tgz
-´´´
+```
 Dentro de la carpeta de pythia se hace make (ya que no se van a agregar extensiones)
-´´´
+```bash
 cd pythia8306
 make
-´´´
+```
 ## Delphes
 Descargar y descomprimir (instrucciones en la [página oficial](https://github.com/delphes/delphes).
-´´´
+```bash
 wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.5.0.tar.gz
 tar -zxf Delphes-3.5.0.tar.gz
-´´´
+```
 Dentro de la carpeta de delphes se instala junto con el event display
-´´´
+```bash
 cd Delphes-3.5.0
 make -jN
 make -jN display
-´´´
+```
 N es el número de núcleos que tiene el computador.
 Para verificar que root corra bien se realizan los siguientes comandos y no debe salir nada.
-´´´
+```bash
 root -l
 gSystem->Load("libDelphes");
-´´´
+```
 ## MadGraph
 
 Para instalar MadGraph hay que tener varias cosas previamente instaladas, ROOT y Python 2.7, la versión 3 de python no es compatible.
