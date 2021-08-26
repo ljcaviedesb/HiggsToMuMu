@@ -1,0 +1,10 @@
+Dentro de Pythia se clona este repositorio.
+
+Para correrlos tenemos 3 archivos mymain01.cc, mymain02.cc y mymain03.cc en donde el 01 produce el Higgs por gluon gluon fusion y lo desintegra en dos muones y genera un archivo .root el cual análogamente es un data frame.
+El archivo 02 genera un archivo .hepmc para darselo a Delphes y este modele cómo detectan estas partículas el detector. Y por último, el arachivo 03 lee un archivo .lhe generado por Madgraph con todos los procesos necesarios.
+
+Para correr estos archivos se debe realizar los siguientes comandos
+
+make mymainxx
+./mymainxx > outputxx
+
